@@ -1,0 +1,118 @@
+@extends('admin.layouts.master')
+@section('styles')
+   <style type="text/css">
+        #divID table {
+            border-top: 1px solid #e7e7e7;
+        }
+        .divtd a:hover{
+            color:  black !important;
+            font-weight: bold;
+        }
+   </style>
+@endsection
+@section('contentBody')
+
+        {{-- <div class="col-lg-12">
+            <div class="card"> --}}
+                <div class="card-title">
+                    <h4 class="text-warning">{{ $title }}</h4>
+                </div>
+                <div class="card-body">
+                    <div id="divID" class="table-responsive">
+                        <table class="table table-bordered" id="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Employee ID</th>
+                                    <th>Designation</th>
+
+                                    <th>Status</th>
+                                    <th>Last Update</th>
+                                    <th>Task Details</th>
+                                    <th>Work Type</th>
+                                    <th>selected Time</th>
+                                    <th>selected Territory</th>
+                                    <th>Visited Territory</th>
+                                    <th>Plan Wise Visited</th>
+                                    <th>Remarks</th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                @foreach($tasks as $key=>$task)
+                                    @php
+                                        $employee = \App\Models\User::where('id',$task->userid)->first();
+                                    @endphp
+                                    @if(isset($employee))
+                                        @php
+                                            if($task->done == '0' && $task->pending == '0'){
+                                                $status = 'Pending';
+                                                $lastUpdate = $task->date.' '.$task->time;
+                                            }
+                                            elseif($task->done == '0' && $task->pending == '1'){
+                                                $status = 'Processing';
+                                                $lastUpdate =  $task->pending_date. ' ' .$task->pending_time ;
+
+                                            }elseif($task->done == '1'){
+                                                $status = 'Done';
+                                                $lastUpdate = $task->done_date. ' ' .$task->done_time ;
+
+                                            }else{
+                                                $status = '';
+                                                $lastUpdate = ' ' ;
+                                            }
+                                        @endphp
+                                    <tr>
+                                        <th scope="row">{{ $key + 1 }}</th>
+                                        <td>{{ $employee->emp_name }}</td>
+                                        <td>{{ $employee->emp_id }}</td>
+                                        <td>{{ $employee->emp_designation }}</td>
+
+                                        @if($task->done == '0' && $task->pending == '0')
+                                            <td><span class="text-danger">Pending</span></td>
+                                        @elseif($task->done == '0' && $task->pending == '1')
+                                            <td><span class="text-warning">Processing</span></td>
+                                        @elseif($task->done == '1')
+                                            <td><span class="text-success">Done</span></td>
+                                        @else
+                                            <td></td>
+                                        @endif
+
+                                        <td style="width: 10%;">{{ $lastUpdate }}</td>
+                                        <td style="width: 20%;">{{ $task->details }}</td>
+
+                                        @if($task->worktype == 'Related to action plan')
+                                            <td><span class="text-success">{{ $task->worktype }}</span></td>
+                                        @elseif($task->worktype == 'Others')
+                                            <td><span class="text-danger">{{ $task->worktype }}</span></td>
+                                        @else
+                                            <td><span class="text-warning">{{ $task->worktype }}</span></td>
+                                        @endif
+
+                                        <td>{{ $task->starttime }}</td>
+                                        <td>{{ $task->seleted_territory }}</td>
+                                        <td>{{ $task->visited_territory }}</td>
+
+                                        @if($task->seleted_territory == $task->visited_territory && $task->seleted_territory != 'none' && $task->visited_territory!='none')
+                                            <td><span style="font-size:24px;color:green">✓</span></td>
+                                        @else
+                                            <td><span style="font-size:24px;color:red">✗</span></td>
+                                        @endif
+
+                                        <td>{{ $task->remarks }}</td>
+                                    </tr>
+                                    @endif
+                                @endforeach
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {{-- </div>
+        </div> --}}
+
+@endsection
+@section('scripts')
+
+@endsection

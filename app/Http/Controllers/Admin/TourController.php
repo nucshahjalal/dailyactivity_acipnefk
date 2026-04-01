@@ -35,13 +35,16 @@ class TourController extends Controller
             //     ->where('is_agenda','2')
             //     ->orderByDesc('id')
             //     ->get();
-            $tasks = Task::whereIn('userid', $employeesList)
-            ->whereBetween('date', [$formattedStartDate, $formattedEndDate])
+             $tasks = Task::with('user')
+            ->when(!empty($employeesList), function ($query) use ($employeesList) {
+                return $query->whereIn('userid', $employeesList);
+            })
+            ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                return $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            })
             ->where('is_agenda', '2')
-            ->when($request->n_portfolio, function ($query) use ($request) {
-                return $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('n_portfolio', $request->n_portfolio);
-                });
+            ->when($request->filled('n_portfolio'), function ($query) use ($request) {
+                return $query->whereRelation('user', 'n_portfolio', $request->n_portfolio);
             })
             ->orderByDesc('id')
             ->get();
@@ -54,14 +57,17 @@ class TourController extends Controller
             //     ->where('is_agenda','2')
             //     ->orderByDesc('id')
             //     ->get();
-            $tasks = Task::whereIn('userid', $employeesList)
-                ->whereBetween('date', [$formattedStartDate, $formattedEndDate])
-                ->where('is_agenda', '2')
-                ->when($request->n_portfolio, function ($query) use ($request) {
-                    return $query->whereHas('user', function ($q) use ($request) {
-                        $q->where('n_portfolio', $request->n_portfolio);
-                    });
-                })
+            $tasks = Task::with('user')
+            ->when(!empty($employeesList), function ($query) use ($employeesList) {
+                return $query->whereIn('userid', $employeesList);
+            })
+            ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                return $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            })
+            ->where('is_agenda', '2')
+            ->when($request->filled('n_portfolio'), function ($query) use ($request) {
+                return $query->whereRelation('user', 'n_portfolio', $request->n_portfolio);
+            })
             ->orderByDesc('id')
             ->get();
 
@@ -72,6 +78,7 @@ class TourController extends Controller
         $data['searchTitle'] = 'On My Supervision';
         return view('admin.tour.index',$data);
     }
+    
     public function all_employee(Request $request){
         $data['title'] = "All Employee";
         $userId = session('userId');
@@ -98,16 +105,20 @@ class TourController extends Controller
             //     ->orderByDesc('id')
             //     ->get();
 
-        $tasks = Task::whereIn('userid', $employeesList)
-        ->whereBetween('date', [$formattedStartDate, $formattedEndDate])
-        ->where('is_agenda', '2')
-        ->when($request->filled('n_portfolio'), function ($query) use ($request) {
-            return $query->whereHas('user', function ($q) use ($request) {
-                $q->where('n_portfolio', $request->n_portfolio);
-            });
-        })
-        ->orderByDesc('id')
-        ->get();
+           $tasks = Task::with('user')
+            ->when(!empty($employeesList), function ($query) use ($employeesList) {
+                return $query->whereIn('userid', $employeesList);
+            })
+            ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                return $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            })
+            ->where('is_agenda', '2')
+            ->when($request->filled('n_portfolio'), function ($query) use ($request) {
+                return $query->whereRelation('user', 'n_portfolio', $request->n_portfolio);
+            })
+            ->orderByDesc('id')
+            ->get();
+
 
         }else{
 
@@ -117,16 +128,21 @@ class TourController extends Controller
             //     ->orderByDesc('id')
             //     ->get();
 
-           $tasks = Task::whereIn('userid', $employeesList)
-            ->whereBetween('date', [$formattedStartDate, $formattedEndDate])
-            ->where('is_agenda', '2')
-            ->when($request->filled('n_portfolio'), function ($query) use ($request) {
-                return $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('n_portfolio', $request->n_portfolio);
-                });
-            })
+            $tasks = Task::with('user')
+                ->when(!empty($employeesList), function ($query) use ($employeesList) {
+                    return $query->whereIn('userid', $employeesList);
+                })
+                ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                    return $query->whereBetween('date', [$request->start_date, $request->end_date]);
+                })
+                ->where('is_agenda', '2')
+                ->when($request->filled('n_portfolio'), function ($query) use ($request) {
+                    return $query->whereRelation('user', 'n_portfolio', $request->n_portfolio);
+                })
             ->orderByDesc('id')
             ->get();
+
+
 
         }
 

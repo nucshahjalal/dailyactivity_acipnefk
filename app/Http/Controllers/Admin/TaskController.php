@@ -33,14 +33,18 @@ class TaskController extends Controller
             // ->orderByDesc('id')
             // ->get();
 
-            $tasks = Task::whereIn('userid', $employeesList)
-                    ->whereBetween('date', [$formattedStartDate, $formattedEndDate])
-                    ->when($request->n_portfolio, function ($query) use ($request) {
-                        return $query->whereHas('user', function ($q) use ($request) {
-                            $q->where('n_portfolio', $request->n_portfolio);
-                        });
-                    })
-            ->orderByDesc('id')->get();
+            $tasks = Task::with('user')
+                ->when(!empty($employeesList), function ($query) use ($employeesList) {
+                    return $query->whereIn('userid', $employeesList);
+                })
+                ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                    return $query->whereBetween('date', [$request->start_date, $request->end_date]);
+                })
+                ->when($request->filled('n_portfolio'), function ($query) use ($request) {
+                    return $query->whereRelation('user', 'n_portfolio', $request->n_portfolio);
+                })
+                ->orderByDesc('id')
+            ->get();
 
         }else{
 
@@ -51,14 +55,18 @@ class TaskController extends Controller
             // ->orderByDesc('id')
             // ->get();
 
-            $tasks = Task::whereIn('userid', $employeesList)
-                    ->whereBetween('date', [$formattedStartDate, $formattedEndDate])
-                    ->when($request->n_portfolio, function ($query) use ($request) {
-                        return $query->whereHas('user', function ($q) use ($request) {
-                            $q->where('n_portfolio', $request->n_portfolio);
-                        });
-                    })
-            ->orderByDesc('id')->get();
+            $tasks = Task::with('user')
+                ->when(!empty($employeesList), function ($query) use ($employeesList) {
+                    return $query->whereIn('userid', $employeesList);
+                })
+                ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                    return $query->whereBetween('date', [$request->start_date, $request->end_date]);
+                })
+                ->when($request->filled('n_portfolio'), function ($query) use ($request) {
+                    return $query->whereRelation('user', 'n_portfolio', $request->n_portfolio);
+                })
+                ->orderByDesc('id')
+            ->get();
         }
 
         $data['searchTitle'] = 'On My Supervision';
@@ -66,6 +74,7 @@ class TaskController extends Controller
         $data['tasks'] = $tasks;
         return view('admin.task.index',$data);
     }
+
     public function all_employee(Request $request){
         $data['title'] = "All Employee";
         $userId = session('userId');
@@ -91,14 +100,20 @@ class TaskController extends Controller
             // ->orderByDesc('id')
             // ->get();
             
-             $tasks = Task::whereIn('userid', $employeesList)
-                    ->whereBetween('date', [$formattedStartDate, $formattedEndDate])
-                    ->when($request->n_portfolio, function ($query) use ($request) {
-                        return $query->whereHas('user', function ($q) use ($request) {
-                            $q->where('n_portfolio', $request->n_portfolio);
-                        });
-                    })
-            ->orderByDesc('id')->get();
+            $tasks = Task::with('user')
+                ->when(!empty($employeesList), function ($query) use ($employeesList) {
+                    return $query->whereIn('userid', $employeesList);
+                })
+                ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                    return $query->whereBetween('date', [$request->start_date, $request->end_date]);
+                })
+                ->when($request->filled('n_portfolio'), function ($query) use ($request) {
+                    return $query->whereRelation('user', 'n_portfolio', $request->n_portfolio);
+                })
+                ->orderByDesc('id')
+                 ->limit(2000)
+            ->get();
+
 
         }else{
 
@@ -106,15 +121,22 @@ class TaskController extends Controller
             // ->whereBetween('date', [$formattedStartDate , $formattedEndDate])
             // ->orderByDesc('id')
             // ->get();
-           $tasks = Task::whereIn('userid', $employeesList)
-                ->whereBetween('date', [$formattedStartDate, $formattedEndDate])
-                ->when($request->n_portfolio, function ($query) use ($request) {
-                    return $query->whereHas('user', function ($q) use ($request) {
-                        $q->where('n_portfolio', $request->n_portfolio);
-                    });
+
+            
+         $tasks = Task::with('user')
+                ->when(!empty($employeesList), function ($query) use ($employeesList) {
+                    return $query->whereIn('userid', $employeesList);
                 })
-                ->orderByDesc('id')->get();
-            }
+                ->when($request->filled(['start_date', 'end_date']), function ($query) use ($request) {
+                    return $query->whereBetween('date', [$request->start_date, $request->end_date]);
+                })
+                ->when($request->filled('n_portfolio'), function ($query) use ($request) {
+                    return $query->whereRelation('user', 'n_portfolio', $request->n_portfolio);
+                })
+                ->orderByDesc('id')
+                 ->limit(2000)
+            ->get();
+        }
 
         $data['tasks'] = $tasks;
         $data['portfolios'] = User::whereNotNull('n_portfolio')->distinct()->pluck('n_portfolio');
